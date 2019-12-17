@@ -79,3 +79,64 @@ const multiplyBy3AndPositive = compose(multiplyBy3, makePositive)
     Nombre d'arguments qu'une fonction prend
     Mieux vaut avoir peu d'arguments dans une fonction
 */
+
+
+/************ Amazon solution ***********/
+/*
+    Implement a cart feature:
+        1 - Add items to cart
+        2 - add 3% tax to item in cart
+        3 - Buy item: cart --> purchases
+        4 - Empty cart
+*/
+const user = {
+    name: "Elie",
+    active: true,
+    cart: [],
+    purchases: []
+}
+
+let history = [];
+
+const compose = (f,g) => (...args) => f(g(...args));
+
+purchaseItem(
+    emptyCart,
+    buyItem,
+    applyTaxToItems,
+    addItemToCart
+)(user, {name: 'laptop', price: 200})
+
+//Récupére ici toutes les fonctions passés en param dans la fonction
+//Et les run une par une grâce au reduce
+function purchaseItem (...functions) {
+    return functions.reduce(compose)
+}
+
+function addItemToCart(user, item) {
+    history.push(user);
+    const updatedCart = user.cart.concat(item);
+    return Object.assign({}, user, {cart: updatedCart})
+}
+
+function applyTaxToItems(user) {
+    const { cart } = user;
+    const taxRate = 1.3;
+    const updatedCart = cart.map(item => {
+        return {
+            name: item.name,
+            price: item.price * taxRate
+        }
+    });
+    return Object.assign({}, user, { cart: updatedCart })
+}
+
+function buyItem(user) {
+    history.push(user);
+    return Object.assign({}, user, { purchases: user.cart });
+}
+
+function emptyCart(user) {
+    history.push(user);
+    return Object.assign({}, user, { cart: [] });
+}
